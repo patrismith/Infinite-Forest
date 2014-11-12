@@ -10,7 +10,7 @@ Play.prototype = {
   create: function() {
     this.treetops = [];
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
-    this.velocity = {x: 0, y: 0};
+    this.velocity = {x: 0, y: 0, canMove: true};
 
     this.ground = new Ground(this.game, 0, 0, this.game.world.width, this.game.world.height);
     this.trees = new Trees(this.game, this.treetops, this.velocity);
@@ -20,6 +20,11 @@ Play.prototype = {
   },
   update: function() {
     this.game.physics.arcade.collide(this.player, this.treetops);
+
+    for (var i = 0; i < this.trees.length; i++) {
+      this.trees.getAt(i).update(this.velocity);
+    }
+
   }
 };
 

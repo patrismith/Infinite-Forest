@@ -117,20 +117,37 @@ Player.prototype.update = function() {
   //    also set velocity to walking velocity
   // 2. if not walking, set animation to standing and that direction
   //    also set velocity to 0
-  if (this.controls.right.isDown) {
-    this.velocity.y = 0;
-    this.velocity.x = this.speed;
-  } else if (this.controls.left.isDown) {
+
+  this.body.velocity.x = 0;
+  this.body.velocity.y = 0;
+
+  if (this.controls.right.isDown && !this.body.touching.right) {
     this.velocity.y = 0;
     this.velocity.x = -this.speed;
-  } else if (this.controls.up.isDown) {
-    this.velocity.y = -this.speed;
-    this.velocity.x = 0;
-  } else if (this.controls.down.isDown) {
+  } else if (this.controls.left.isDown && !this.body.touching.left) {
+    this.velocity.y = 0;
+    this.velocity.x = this.speed;
+  } else if (this.controls.up.isDown && !this.body.touching.up) {
     this.velocity.y = this.speed;
+    this.velocity.x = 0;
+  } else if (this.controls.down.isDown && !this.body.touching.down) {
+    this.velocity.y = -this.speed;
     this.velocity.x = 0;
   };
 
+  if (this.velocity.y > 0 && this.body.touching.up) {
+    this.velocity.y = 0;
+  }
+  if (this.velocity.y < 0 && this.body.touching.down) {
+    this.velocity.y = 0;
+  }
+  if (this.velocity.x > 0 && this.body.touching.left) {
+    this.velocity.x = 0;
+  }
+  if (this.velocity.x < 0 && this.body.touching.right) {
+    console.log('fuck this');
+    this.velocity.x = 0;
+  }
 };
 
 module.exports = Player;
@@ -205,10 +222,6 @@ Trees.prototype.constructor = Trees;
 Trees.prototype.update = function() {
   // if there's trees offscreen (give a margin of 800/600 pixels either side), delete
   // recycle them to trees that are about to be onscreen (within that margin)
-
-  for (var i = 0; i < this.length; i++) {
-    this.getAt(i).update(this.velocity);
-  }
 
   this.sort('y', Phaser.Group.SORT_ASCENDING);
 };
@@ -328,7 +341,7 @@ Play.prototype = {
   create: function() {
     this.treetops = [];
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
-    this.velocity = {x: 0, y: 0};
+    this.velocity = {x: 0, y: 0, canMove: true};
 
     this.ground = new Ground(this.game, 0, 0, this.game.world.width, this.game.world.height);
     this.trees = new Trees(this.game, this.treetops, this.velocity);
@@ -338,6 +351,11 @@ Play.prototype = {
   },
   update: function() {
     this.game.physics.arcade.collide(this.player, this.treetops);
+
+    for (var i = 0; i < this.trees.length; i++) {
+      this.trees.getAt(i).update(this.velocity);
+    }
+
   }
 };
 

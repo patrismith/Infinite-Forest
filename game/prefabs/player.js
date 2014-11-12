@@ -35,20 +35,37 @@ Player.prototype.update = function() {
   //    also set velocity to walking velocity
   // 2. if not walking, set animation to standing and that direction
   //    also set velocity to 0
-  if (this.controls.right.isDown) {
-    this.velocity.y = 0;
-    this.velocity.x = this.speed;
-  } else if (this.controls.left.isDown) {
+
+  this.body.velocity.x = 0;
+  this.body.velocity.y = 0;
+
+  if (this.controls.right.isDown && !this.body.touching.right) {
     this.velocity.y = 0;
     this.velocity.x = -this.speed;
-  } else if (this.controls.up.isDown) {
-    this.velocity.y = -this.speed;
-    this.velocity.x = 0;
-  } else if (this.controls.down.isDown) {
+  } else if (this.controls.left.isDown && !this.body.touching.left) {
+    this.velocity.y = 0;
+    this.velocity.x = this.speed;
+  } else if (this.controls.up.isDown && !this.body.touching.up) {
     this.velocity.y = this.speed;
+    this.velocity.x = 0;
+  } else if (this.controls.down.isDown && !this.body.touching.down) {
+    this.velocity.y = -this.speed;
     this.velocity.x = 0;
   };
 
+  if (this.velocity.y > 0 && this.body.touching.up) {
+    this.velocity.y = 0;
+  }
+  if (this.velocity.y < 0 && this.body.touching.down) {
+    this.velocity.y = 0;
+  }
+  if (this.velocity.x > 0 && this.body.touching.left) {
+    this.velocity.x = 0;
+  }
+  if (this.velocity.x < 0 && this.body.touching.right) {
+    console.log('fuck this');
+    this.velocity.x = 0;
+  }
 };
 
 module.exports = Player;
