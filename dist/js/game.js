@@ -16,7 +16,7 @@ window.onload = function () {
 
   game.state.start('boot');
 };
-},{"./states/boot":7,"./states/gameover":8,"./states/menu":9,"./states/play":10,"./states/preload":11,"./states/title":12}],2:[function(require,module,exports){
+},{"./states/boot":8,"./states/gameover":9,"./states/menu":10,"./states/play":11,"./states/preload":12,"./states/title":13}],2:[function(require,module,exports){
 'use strict';
 
 var AssetLoader = (function () {
@@ -81,8 +81,8 @@ module.exports = Ground;
 var Treetop = require('../prefabs/treetop');
 var Treebottom = require('../prefabs/treebottom');
 
-var Tree = function(game, x, y) {
-  Phaser.Group.call(this, game);
+var Tree = function(game, parent, x, y) {
+  Phaser.Group.call(this, game, parent);
   this.top = new Treetop(game, x, y);
   this.bottom = new Treebottom(game, x, y+112);
   //game.add.existing(this.top);
@@ -101,7 +101,7 @@ Tree.prototype.update = function() {
 
 module.exports = Tree;
 
-},{"../prefabs/treebottom":5,"../prefabs/treetop":6}],5:[function(require,module,exports){
+},{"../prefabs/treebottom":5,"../prefabs/treetop":7}],5:[function(require,module,exports){
 'use strict';
 
 var Treebottom = function(game, x, y, frame) {
@@ -125,6 +125,31 @@ module.exports = Treebottom;
 },{}],6:[function(require,module,exports){
 'use strict';
 
+var Tree = require('../prefabs/tree');
+
+var Trees = function(game) {
+  Phaser.Group.call(this, game);
+  for (var i = 0; i < 2; i++) {
+    var tree = new Tree(game, this, i*50, i*50);
+    this.add(tree);
+  }
+};
+
+Trees.prototype = Object.create(Phaser.Group.prototype);
+Trees.prototype.constructor = Trees;
+
+Trees.prototype.update = function() {
+  // if there's trees offscreen (give a margin of 800/600 pixels either side), delete
+  // recycle them to trees that are about to be onscreen (within that margin)
+
+
+};
+
+module.exports = Trees;
+
+},{"../prefabs/tree":4}],7:[function(require,module,exports){
+'use strict';
+
 var Treetop = function(game, x, y, frame) {
   Phaser.Sprite.call(this, game, x, y, 'treetop', frame);
 
@@ -143,7 +168,7 @@ Treetop.prototype.update = function() {
 
 module.exports = Treetop;
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 
 'use strict';
 
@@ -162,7 +187,7 @@ Boot.prototype = {
 
 module.exports = Boot;
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 
 'use strict';
 function GameOver() {}
@@ -190,7 +215,7 @@ GameOver.prototype = {
 };
 module.exports = GameOver;
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 
 'use strict';
 function Menu() {}
@@ -222,18 +247,18 @@ Menu.prototype = {
 
 module.exports = Menu;
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 'use strict';
 
 // import player, slime, tree
 var Ground = require('../prefabs/ground');
-var Tree = require('../prefabs/tree');
+var Trees = require('../prefabs/trees');
 
 function Play() {}
 Play.prototype = {
   create: function() {
     this.ground = new Ground(this.game, 0, 0, 800, 600);
-    this.tree = new Tree(this.game, 50, 50);
+    this.trees = new Trees(this.game);
     // initialize player
     // initialize tree group
     // initialize slime group
@@ -245,7 +270,7 @@ Play.prototype = {
 
 module.exports = Play;
 
-},{"../prefabs/ground":3,"../prefabs/tree":4}],11:[function(require,module,exports){
+},{"../prefabs/ground":3,"../prefabs/trees":6}],12:[function(require,module,exports){
 'use strict';
 
 var AssetLoader = require('../prefabs/AssetLoader');
@@ -280,7 +305,7 @@ Preload.prototype = {
 
 module.exports = Preload;
 
-},{"../prefabs/AssetLoader":2}],12:[function(require,module,exports){
+},{"../prefabs/AssetLoader":2}],13:[function(require,module,exports){
 'use strict';
 function Title() {}
 

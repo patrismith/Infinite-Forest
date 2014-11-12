@@ -3,8 +3,8 @@
 var Treetop = require('../prefabs/treetop');
 var Treebottom = require('../prefabs/treebottom');
 
-var Tree = function(game, x, y) {
-  Phaser.Group.call(this, game);
+var Tree = function(game, parent, x, y) {
+  Phaser.Group.call(this, game, parent);
   this.top = new Treetop(game, x, y);
   this.bottom = new Treebottom(game, x, y+112);
   //game.add.existing(this.top);

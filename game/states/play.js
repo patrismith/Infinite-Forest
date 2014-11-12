@@ -2,13 +2,13 @@
 
 // import player, slime, tree
 var Ground = require('../prefabs/ground');
-var Tree = require('../prefabs/tree');
+var Trees = require('../prefabs/trees');
 
 function Play() {}
 Play.prototype = {
   create: function() {
     this.ground = new Ground(this.game, 0, 0, 800, 600);
-    this.tree = new Tree(this.game, 50, 50);
+    this.trees = new Trees(this.game);
     // initialize player
     // initialize tree group
     // initialize slime group
