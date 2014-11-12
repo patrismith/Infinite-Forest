@@ -2,7 +2,9 @@
 
 var Player = function(game, x, y, frame) {
   Phaser.Sprite.call(this, game, x, y, 'player', frame);
+  game.physics.arcade.enableBody(this);
   // start walking
+  this.body.velocity.x += 30;
 };
 
 Player.prototype = Object.create(Phaser.Sprite.prototype);
@@ -27,7 +29,6 @@ Player.prototype.update = function() {
   //    also set velocity to walking velocity
   // 2. if not walking, set animation to standing and that direction
   //    also set velocity to 0
-
 };
 
 module.exports = Player;

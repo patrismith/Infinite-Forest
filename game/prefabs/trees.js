@@ -2,10 +2,10 @@
 
 var Tree = require('../prefabs/tree');
 
-var Trees = function(game) {
+var Trees = function(game, collisionArray) {
   Phaser.Group.call(this, game);
   for (var i = 0; i < 20; i++) {
-    var tree = new Tree(game, this, Math.floor(Math.random()*400), Math.floor(Math.random()*300));
+    var tree = new Tree(game, this, Math.floor(Math.random()*400), Math.floor(Math.random()*300), collisionArray);
     this.add(tree);
   }
 };

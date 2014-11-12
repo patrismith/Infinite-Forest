@@ -16,7 +16,7 @@ window.onload = function () {
 
   game.state.start('boot');
 };
-},{"./states/boot":8,"./states/gameover":9,"./states/menu":10,"./states/play":11,"./states/preload":12,"./states/title":13}],2:[function(require,module,exports){
+},{"./states/boot":9,"./states/gameover":10,"./states/menu":11,"./states/play":12,"./states/preload":13,"./states/title":14}],2:[function(require,module,exports){
 'use strict';
 
 var AssetLoader = (function () {
@@ -78,18 +78,58 @@ module.exports = Ground;
 },{}],4:[function(require,module,exports){
 'use strict';
 
+var Player = function(game, x, y, frame) {
+  Phaser.Sprite.call(this, game, x, y, 'player', frame);
+  game.physics.arcade.enableBody(this);
+  // start walking
+  this.body.velocity.x += 30;
+};
+
+Player.prototype = Object.create(Phaser.Sprite.prototype);
+Player.prototype.constructor = Player;
+
+Player.prototype.update = function() {
+  // make walking decisions:
+  // 1. find out if moving forward (function)
+  //    this function will see if the player is colliding w/ a tree
+  //    on the side that's facing the player's walking direction
+  // 2. if not moving forward, turn randomly clockwise or counter-clockwise
+  //    there will be a list of directions, n e s w , use mod + additions/subtractions to figure
+
+  // make attack decisions:
+  // 1. find out if touching slime (function)
+  // 1a. if slime touching non-forward-facing direction, set direction to that
+  // 2. if slime touching forward-facing direction, set animation to attacking slime
+
+  // player has a variable that says which direction they need to move in
+  // player also has a variable that says whether to be walking or not
+  // 1. if walking, set animation to walking and that direction
+  //    also set velocity to walking velocity
+  // 2. if not walking, set animation to standing and that direction
+  //    also set velocity to 0
+};
+
+module.exports = Player;
+
+},{}],5:[function(require,module,exports){
+'use strict';
+
 var Treetop = require('../prefabs/treetop');
 var Treebottom = require('../prefabs/treebottom');
 
-var Tree = function(game, parent, x, y) {
-  Phaser.Group.call(this, game, parent);
-  this.top = new Treetop(game, x, y);
-  this.bottom = new Treebottom(game, x, y+112);
+var Tree = function(game, parent, x, y, collisionArray) {
+  Phaser.Group.call(this, game, parent, undefined, false, true, Phaser.Physics.ARCADE);
+  //this.top = new Treetop(game, x, y);
+  //this.bottom = new Treebottom(game, x, y+112);
+  var treetop = this.create(x, y, 'treetop');
+  treetop.body.immovable = true;
+  collisionArray.push(treetop);
+  this.create(x, y+112, 'treebottom');
   this.x = x;
   this.y = y;
   //game.add.existing(this.top);
-  this.add(this.top);
-  this.add(this.bottom);
+  //this.add(this.top);
+  //this.add(this.bottom);
 };
 
 Tree.prototype = Object.create(Phaser.Group.prototype);
@@ -103,7 +143,7 @@ Tree.prototype.update = function() {
 
 module.exports = Tree;
 
-},{"../prefabs/treebottom":5,"../prefabs/treetop":7}],5:[function(require,module,exports){
+},{"../prefabs/treebottom":6,"../prefabs/treetop":8}],6:[function(require,module,exports){
 'use strict';
 
 var Treebottom = function(game, x, y, frame) {
@@ -124,15 +164,15 @@ Treebottom.prototype.update = function() {
 
 module.exports = Treebottom;
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 'use strict';
 
 var Tree = require('../prefabs/tree');
 
-var Trees = function(game) {
+var Trees = function(game, collisionArray) {
   Phaser.Group.call(this, game);
   for (var i = 0; i < 20; i++) {
-    var tree = new Tree(game, this, Math.floor(Math.random()*400), Math.floor(Math.random()*300));
+    var tree = new Tree(game, this, Math.floor(Math.random()*400), Math.floor(Math.random()*300), collisionArray);
     this.add(tree);
   }
 };
@@ -148,7 +188,7 @@ Trees.prototype.update = function() {
 
 module.exports = Trees;
 
-},{"../prefabs/tree":4}],7:[function(require,module,exports){
+},{"../prefabs/tree":5}],8:[function(require,module,exports){
 'use strict';
 
 var Treetop = function(game, x, y, frame) {
@@ -169,7 +209,7 @@ Treetop.prototype.update = function() {
 
 module.exports = Treetop;
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 
 'use strict';
 
@@ -188,7 +228,7 @@ Boot.prototype = {
 
 module.exports = Boot;
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 
 'use strict';
 function GameOver() {}
@@ -216,7 +256,7 @@ GameOver.prototype = {
 };
 module.exports = GameOver;
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 
 'use strict';
 function Menu() {}
@@ -248,30 +288,36 @@ Menu.prototype = {
 
 module.exports = Menu;
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 'use strict';
 
 // import player, slime, tree
 var Ground = require('../prefabs/ground');
 var Trees = require('../prefabs/trees');
+var Player = require('../prefabs/player');
 
 function Play() {}
 Play.prototype = {
   create: function() {
+    this.treetops = [];
     this.ground = new Ground(this.game, 0, 0, 800, 600);
-    this.trees = new Trees(this.game);
+    this.trees = new Trees(this.game, this.treetops);
+    this.game.physics.startSystem(Phaser.Physics.ARCADE);
+    this.player = new Player(this.game, 100, 100);
+    this.trees.add(this.player);
     // initialize player
     // initialize tree group
     // initialize slime group
   },
   update: function() {
     // make sure the three above are updating (may be automatic)
+    this.game.physics.arcade.collide(this.player, this.treetops);
   }
 };
 
 module.exports = Play;
 
-},{"../prefabs/ground":3,"../prefabs/trees":6}],12:[function(require,module,exports){
+},{"../prefabs/ground":3,"../prefabs/player":4,"../prefabs/trees":7}],13:[function(require,module,exports){
 'use strict';
 
 var AssetLoader = require('../prefabs/AssetLoader');
@@ -288,7 +334,7 @@ Preload.prototype = {
 
     this.load.onLoadComplete.addOnce(this.onLoadComplete, this);
     this.load.setPreloadSprite(this.asset);
-    var images = [ 'treebottom', 'treetop', 'grass' ];
+    var images = [ 'treebottom', 'treetop', 'grass', 'player' ];
     AssetLoader.loadImages.call(this, images);
   },
   create: function() {
@@ -306,7 +352,7 @@ Preload.prototype = {
 
 module.exports = Preload;
 
-},{"../prefabs/AssetLoader":2}],13:[function(require,module,exports){
+},{"../prefabs/AssetLoader":2}],14:[function(require,module,exports){
 'use strict';
 function Title() {}
 
