@@ -5,26 +5,23 @@ var Treebottom = require('../prefabs/treebottom');
 
 var Tree = function(game, parent, x, y, collisionArray) {
   Phaser.Group.call(this, game, parent, undefined, false, true, Phaser.Physics.ARCADE);
-  //this.top = new Treetop(game, x, y);
-  //this.bottom = new Treebottom(game, x, y+112);
-  var treetop = this.create(x, y, 'treetop');
-  treetop.body.immovable = true;
-  collisionArray.push(treetop);
-  this.create(x, y+112, 'treebottom');
+  this.treetop = this.create(x, y, 'treetop');
+  this.treetop.body.immovable = true;
+  collisionArray.push(this.treetop);
+  this.treebottom = this.create(x, y+112, 'treebottom');
+  this.treebottom.body.immovable.true;
   this.x = x;
   this.y = y;
-  //game.add.existing(this.top);
-  //this.add(this.top);
-  //this.add(this.bottom);
 };
 
 Tree.prototype = Object.create(Phaser.Group.prototype);
 Tree.prototype.constructor = Tree;
 
-Tree.prototype.update = function() {
-
-  // write your prefab's specific update code here
-
+Tree.prototype.update = function(velocity) {
+  this.treetop.body.velocity.x = velocity.x;
+  this.treebottom.body.velocity.x = velocity.x;
+  this.treetop.body.velocity.y = velocity.y;
+  this.treebottom.body.velocity.y = velocity.y;
 };
 
 module.exports = Tree;

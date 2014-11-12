@@ -1,16 +1,22 @@
 'use strict';
 
-var Player = function(game, x, y, frame) {
-  Phaser.Sprite.call(this, game, x, y, 'player', frame);
+var Player = function(game, x, y, controls, velocity) {
+  Phaser.Sprite.call(this, game, x, y, 'player');
   game.physics.arcade.enableBody(this);
   // start walking
-  this.body.velocity.x += 30;
+  this.anchor.setTo(0.5,0.5);
+  this.speed = 50;
+  this.controls = controls;
+  this.game.add.existing(this);
+  this.velocity = velocity;
+  this.body.immovable.true;
 };
 
 Player.prototype = Object.create(Phaser.Sprite.prototype);
 Player.prototype.constructor = Player;
 
 Player.prototype.update = function() {
+
   // make walking decisions:
   // 1. find out if moving forward (function)
   //    this function will see if the player is colliding w/ a tree
@@ -29,6 +35,20 @@ Player.prototype.update = function() {
   //    also set velocity to walking velocity
   // 2. if not walking, set animation to standing and that direction
   //    also set velocity to 0
+  if (this.controls.right.isDown) {
+    this.velocity.y = 0;
+    this.velocity.x = this.speed;
+  } else if (this.controls.left.isDown) {
+    this.velocity.y = 0;
+    this.velocity.x = -this.speed;
+  } else if (this.controls.up.isDown) {
+    this.velocity.y = -this.speed;
+    this.velocity.x = 0;
+  } else if (this.controls.down.isDown) {
+    this.velocity.y = this.speed;
+    this.velocity.x = 0;
+  };
+
 };
 
 module.exports = Player;

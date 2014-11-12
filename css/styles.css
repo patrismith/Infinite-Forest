@@ -2,10 +2,9 @@ body {
   background-color: #333;
 }
 
-#procjam {
-  border: 2px solid white;
-  width: 800px;
-  margin-left: auto;
-  margin-right: auto;
-  cursor: pointer;
+body, #procjam {
+  //border: 2px solid white;
+  //width: 800px;
+    margin: 0;
+    padding: 0;
 }

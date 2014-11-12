@@ -3,7 +3,10 @@
 
 //global variables
 window.onload = function () {
-  var game = new Phaser.Game(800, 600, Phaser.AUTO, 'procjam');
+  //var game = new Phaser.Game(800, 600, Phaser.AUTO, 'procjam');
+  var game = new Phaser.Game(window.innerWidth * window.devicePixelRatio,
+                             window.innerHeight * window.devicePixelRatio,
+                             Phaser.AUTO, 'procjam');
 
   // Game States
   game.state.add('boot', require('./states/boot'));
@@ -16,6 +19,7 @@ window.onload = function () {
 
   game.state.start('boot');
 };
+
 },{"./states/boot":9,"./states/gameover":10,"./states/menu":11,"./states/play":12,"./states/preload":13,"./states/title":14}],2:[function(require,module,exports){
 'use strict';
 
@@ -78,17 +82,23 @@ module.exports = Ground;
 },{}],4:[function(require,module,exports){
 'use strict';
 
-var Player = function(game, x, y, frame) {
-  Phaser.Sprite.call(this, game, x, y, 'player', frame);
+var Player = function(game, x, y, controls, velocity) {
+  Phaser.Sprite.call(this, game, x, y, 'player');
   game.physics.arcade.enableBody(this);
   // start walking
-  this.body.velocity.x += 30;
+  this.anchor.setTo(0.5,0.5);
+  this.speed = 50;
+  this.controls = controls;
+  this.game.add.existing(this);
+  this.velocity = velocity;
+  this.body.immovable.true;
 };
 
 Player.prototype = Object.create(Phaser.Sprite.prototype);
 Player.prototype.constructor = Player;
 
 Player.prototype.update = function() {
+
   // make walking decisions:
   // 1. find out if moving forward (function)
   //    this function will see if the player is colliding w/ a tree
@@ -107,6 +117,20 @@ Player.prototype.update = function() {
   //    also set velocity to walking velocity
   // 2. if not walking, set animation to standing and that direction
   //    also set velocity to 0
+  if (this.controls.right.isDown) {
+    this.velocity.y = 0;
+    this.velocity.x = this.speed;
+  } else if (this.controls.left.isDown) {
+    this.velocity.y = 0;
+    this.velocity.x = -this.speed;
+  } else if (this.controls.up.isDown) {
+    this.velocity.y = -this.speed;
+    this.velocity.x = 0;
+  } else if (this.controls.down.isDown) {
+    this.velocity.y = this.speed;
+    this.velocity.x = 0;
+  };
+
 };
 
 module.exports = Player;
@@ -119,26 +143,23 @@ var Treebottom = require('../prefabs/treebottom');
 
 var Tree = function(game, parent, x, y, collisionArray) {
   Phaser.Group.call(this, game, parent, undefined, false, true, Phaser.Physics.ARCADE);
-  //this.top = new Treetop(game, x, y);
-  //this.bottom = new Treebottom(game, x, y+112);
-  var treetop = this.create(x, y, 'treetop');
-  treetop.body.immovable = true;
-  collisionArray.push(treetop);
-  this.create(x, y+112, 'treebottom');
+  this.treetop = this.create(x, y, 'treetop');
+  this.treetop.body.immovable = true;
+  collisionArray.push(this.treetop);
+  this.treebottom = this.create(x, y+112, 'treebottom');
+  this.treebottom.body.immovable.true;
   this.x = x;
   this.y = y;
-  //game.add.existing(this.top);
-  //this.add(this.top);
-  //this.add(this.bottom);
 };
 
 Tree.prototype = Object.create(Phaser.Group.prototype);
 Tree.prototype.constructor = Tree;
 
-Tree.prototype.update = function() {
-
-  // write your prefab's specific update code here
-
+Tree.prototype.update = function(velocity) {
+  this.treetop.body.velocity.x = velocity.x;
+  this.treebottom.body.velocity.x = velocity.x;
+  this.treetop.body.velocity.y = velocity.y;
+  this.treebottom.body.velocity.y = velocity.y;
 };
 
 module.exports = Tree;
@@ -169,12 +190,13 @@ module.exports = Treebottom;
 
 var Tree = require('../prefabs/tree');
 
-var Trees = function(game, collisionArray) {
+var Trees = function(game, collisionArray, velocity) {
   Phaser.Group.call(this, game);
   for (var i = 0; i < 20; i++) {
     var tree = new Tree(game, this, Math.floor(Math.random()*400), Math.floor(Math.random()*300), collisionArray);
     this.add(tree);
   }
+  this.velocity = velocity;
 };
 
 Trees.prototype = Object.create(Phaser.Group.prototype);
@@ -183,6 +205,11 @@ Trees.prototype.constructor = Trees;
 Trees.prototype.update = function() {
   // if there's trees offscreen (give a margin of 800/600 pixels either side), delete
   // recycle them to trees that are about to be onscreen (within that margin)
+
+  for (var i = 0; i < this.length; i++) {
+    this.getAt(i).update(this.velocity);
+  }
+
   this.sort('y', Phaser.Group.SORT_ASCENDING);
 };
 
@@ -300,17 +327,16 @@ function Play() {}
 Play.prototype = {
   create: function() {
     this.treetops = [];
-    this.ground = new Ground(this.game, 0, 0, 800, 600);
-    this.trees = new Trees(this.game, this.treetops);
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
-    this.player = new Player(this.game, 100, 100);
-    this.trees.add(this.player);
-    // initialize player
-    // initialize tree group
-    // initialize slime group
+    this.velocity = {x: 0, y: 0};
+
+    this.ground = new Ground(this.game, 0, 0, this.game.world.width, this.game.world.height);
+    this.trees = new Trees(this.game, this.treetops, this.velocity);
+
+    this.cursors = this.game.input.keyboard.createCursorKeys()
+    this.player = new Player(this.game, this.game.world.width/2, this.game.world.height/2, this.cursors, this.velocity);
   },
   update: function() {
-    // make sure the three above are updating (may be automatic)
     this.game.physics.arcade.collide(this.player, this.treetops);
   }
 };
