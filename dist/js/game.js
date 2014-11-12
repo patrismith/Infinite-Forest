@@ -85,6 +85,8 @@ var Tree = function(game, parent, x, y) {
   Phaser.Group.call(this, game, parent);
   this.top = new Treetop(game, x, y);
   this.bottom = new Treebottom(game, x, y+112);
+  this.x = x;
+  this.y = y;
   //game.add.existing(this.top);
   this.add(this.top);
   this.add(this.bottom);
@@ -129,8 +131,8 @@ var Tree = require('../prefabs/tree');
 
 var Trees = function(game) {
   Phaser.Group.call(this, game);
-  for (var i = 0; i < 2; i++) {
-    var tree = new Tree(game, this, i*50, i*50);
+  for (var i = 0; i < 20; i++) {
+    var tree = new Tree(game, this, Math.floor(Math.random()*400), Math.floor(Math.random()*300));
     this.add(tree);
   }
 };
@@ -141,8 +143,7 @@ Trees.prototype.constructor = Trees;
 Trees.prototype.update = function() {
   // if there's trees offscreen (give a margin of 800/600 pixels either side), delete
   // recycle them to trees that are about to be onscreen (within that margin)
-
-
+  this.sort('y', Phaser.Group.SORT_ASCENDING);
 };
 
 module.exports = Trees;
