@@ -1,19 +1,24 @@
 'use strict';
 
-var Tree = function(game, x, y, frame) {
-  Phaser.Sprite.call(this, game, x, y, 'tree', frame);
+var Treetop = require('../prefabs/treetop');
+var Treebottom = require('../prefabs/treebottom');
 
-  // initialize your prefab here
-  
+var Tree = function(game, x, y) {
+  Phaser.Group.call(this, game);
+  this.top = new Treetop(game, x, y);
+  this.bottom = new Treebottom(game, x, y+112);
+  //game.add.existing(this.top);
+  this.add(this.top);
+  this.add(this.bottom);
 };
 
-Tree.prototype = Object.create(Phaser.Sprite.prototype);
+Tree.prototype = Object.create(Phaser.Group.prototype);
 Tree.prototype.constructor = Tree;
 
 Tree.prototype.update = function() {
-  
+
   // write your prefab's specific update code here
-  
+
 };
 
 module.exports = Tree;

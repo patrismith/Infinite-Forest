@@ -16,7 +16,7 @@ window.onload = function () {
 
   game.state.start('boot');
 };
-},{"./states/boot":4,"./states/gameover":5,"./states/menu":6,"./states/play":7,"./states/preload":8,"./states/title":9}],2:[function(require,module,exports){
+},{"./states/boot":7,"./states/gameover":8,"./states/menu":9,"./states/play":10,"./states/preload":11,"./states/title":12}],2:[function(require,module,exports){
 'use strict';
 
 var AssetLoader = (function () {
@@ -76,6 +76,74 @@ Ground.prototype.update = function() {
 module.exports = Ground;
 
 },{}],4:[function(require,module,exports){
+'use strict';
+
+var Treetop = require('../prefabs/treetop');
+var Treebottom = require('../prefabs/treebottom');
+
+var Tree = function(game, x, y) {
+  Phaser.Group.call(this, game);
+  this.top = new Treetop(game, x, y);
+  this.bottom = new Treebottom(game, x, y+112);
+  //game.add.existing(this.top);
+  this.add(this.top);
+  this.add(this.bottom);
+};
+
+Tree.prototype = Object.create(Phaser.Group.prototype);
+Tree.prototype.constructor = Tree;
+
+Tree.prototype.update = function() {
+
+  // write your prefab's specific update code here
+
+};
+
+module.exports = Tree;
+
+},{"../prefabs/treebottom":5,"../prefabs/treetop":6}],5:[function(require,module,exports){
+'use strict';
+
+var Treebottom = function(game, x, y, frame) {
+  Phaser.Sprite.call(this, game, x, y, 'treebottom', frame);
+
+  // initialize your prefab here
+  
+};
+
+Treebottom.prototype = Object.create(Phaser.Sprite.prototype);
+Treebottom.prototype.constructor = Treebottom;
+
+Treebottom.prototype.update = function() {
+  
+  // write your prefab's specific update code here
+  
+};
+
+module.exports = Treebottom;
+
+},{}],6:[function(require,module,exports){
+'use strict';
+
+var Treetop = function(game, x, y, frame) {
+  Phaser.Sprite.call(this, game, x, y, 'treetop', frame);
+
+  // initialize your prefab here
+  
+};
+
+Treetop.prototype = Object.create(Phaser.Sprite.prototype);
+Treetop.prototype.constructor = Treetop;
+
+Treetop.prototype.update = function() {
+  
+  // write your prefab's specific update code here
+  
+};
+
+module.exports = Treetop;
+
+},{}],7:[function(require,module,exports){
 
 'use strict';
 
@@ -94,7 +162,7 @@ Boot.prototype = {
 
 module.exports = Boot;
 
-},{}],5:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 
 'use strict';
 function GameOver() {}
@@ -122,7 +190,7 @@ GameOver.prototype = {
 };
 module.exports = GameOver;
 
-},{}],6:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 
 'use strict';
 function Menu() {}
@@ -154,17 +222,18 @@ Menu.prototype = {
 
 module.exports = Menu;
 
-},{}],7:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 'use strict';
 
 // import player, slime, tree
 var Ground = require('../prefabs/ground');
+var Tree = require('../prefabs/tree');
 
 function Play() {}
 Play.prototype = {
   create: function() {
     this.ground = new Ground(this.game, 0, 0, 800, 600);
-
+    this.tree = new Tree(this.game, 50, 50);
     // initialize player
     // initialize tree group
     // initialize slime group
@@ -176,7 +245,7 @@ Play.prototype = {
 
 module.exports = Play;
 
-},{"../prefabs/ground":3}],8:[function(require,module,exports){
+},{"../prefabs/ground":3,"../prefabs/tree":4}],11:[function(require,module,exports){
 'use strict';
 
 var AssetLoader = require('../prefabs/AssetLoader');
@@ -211,7 +280,7 @@ Preload.prototype = {
 
 module.exports = Preload;
 
-},{"../prefabs/AssetLoader":2}],9:[function(require,module,exports){
+},{"../prefabs/AssetLoader":2}],12:[function(require,module,exports){
 'use strict';
 function Title() {}
 
