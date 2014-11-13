@@ -9,7 +9,8 @@ var Tree = function(game, parent, x, y, collisionArray) {
   this.y = y;
   this.treetop = this.create(0,0, 'treetop');
   this.treetop.body.immovable = true;
-  collisionArray.push(this.treetop);
+  this.collisionArray = collisionArray;
+  this.collisionArray.push(this.treetop);
   this.treebottom = this.create(0, 112, 'treebottom');
   this.treebottom.body.immovable.true;
   this.treetop.checkWorldBounds = true;
@@ -24,15 +25,18 @@ Tree.prototype.update = function(velocity) {
   this.treebottom.body.velocity.x = velocity.x;
   this.treetop.body.velocity.y = velocity.y;
   this.treebottom.body.velocity.y = velocity.y;
-  if (!this.outOfBoundsKill &&
-      (this.treetop.x < this.game.world.width &&
-       this.treetop.x > 0 &&
-       this.treetop.y < this.game.world.height &&
-       this.treetop.y > 0)) {
+  if (!this.treetop.outOfBoundsKill &&
+      (this.x < this.game.world.width &&
+       this.x > 0 &&
+       this.y < this.game.world.height &&
+       this.y > 0)) {
+    console.log('kill me');
     this.treetop.outOfBoundsKill = true;
   }
   if (!this.treetop.alive) {
     this.destroy();
+    console.log('tree destroyed');
+    this.collisionArray.pop(this.treetop);
   };
 };
 

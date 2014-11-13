@@ -163,7 +163,8 @@ var Tree = function(game, parent, x, y, collisionArray) {
   this.y = y;
   this.treetop = this.create(0,0, 'treetop');
   this.treetop.body.immovable = true;
-  collisionArray.push(this.treetop);
+  this.collisionArray = collisionArray;
+  this.collisionArray.push(this.treetop);
   this.treebottom = this.create(0, 112, 'treebottom');
   this.treebottom.body.immovable.true;
   this.treetop.checkWorldBounds = true;
@@ -178,15 +179,18 @@ Tree.prototype.update = function(velocity) {
   this.treebottom.body.velocity.x = velocity.x;
   this.treetop.body.velocity.y = velocity.y;
   this.treebottom.body.velocity.y = velocity.y;
-  if (!this.outOfBoundsKill &&
-      (this.treetop.x < this.game.world.width &&
-       this.treetop.x > 0 &&
-       this.treetop.y < this.game.world.height &&
-       this.treetop.y > 0)) {
+  if (!this.treetop.outOfBoundsKill &&
+      (this.x < this.game.world.width &&
+       this.x > 0 &&
+       this.y < this.game.world.height &&
+       this.y > 0)) {
+    console.log('kill me');
     this.treetop.outOfBoundsKill = true;
   }
   if (!this.treetop.alive) {
     this.destroy();
+    console.log('tree destroyed');
+    this.collisionArray.pop(this.treetop);
   };
 };
 
@@ -223,10 +227,10 @@ var Trees = function(game, collisionArray, velocity) {
   this.maxTrees = 20;
   this.collisionArray = collisionArray;
   for (var i = 0; i < 20; i++) {
-    var x = game.math.snapTo(game.world.randomX, 50);
-    var y = game.math.snapTo(game.world.randomY, 50);
+    var x = game.math.snapTo(game.world.randomX, 75);
+    var y = game.math.snapTo(game.world.randomY, 75);
     //console.log(x,y);
-    var tree = new Tree(game, this, Math.floor(Math.random()*400), Math.floor(Math.random()*300), this.collisionArray);
+    var tree = new Tree(game, this, x, y, this.collisionArray);
     this.add(tree);
   }
   this.velocity = velocity;
@@ -239,16 +243,19 @@ Trees.prototype.update = function() {
   // if there's trees offscreen (give a margin of 800/600 pixels either side), delete
   // recycle them to trees that are about to be onscreen (within that margin)
   if (this.length < this.maxTrees) {
-    var x = this.game.math.snapTo(this.game.world.randomX, 50);
-    var y = this.game.world.height + 50;
+    var x = this.game.math.snapTo(this.game.world.randomX, 75);
+    var y = this.game.world.height + 10;
     //console.log(x,y);
-    var tree = new Tree(this.game, this, Math.floor(Math.random()*400), y, this.collisionArray);
+    var tree = new Tree(this.game, this, x, y, this.collisionArray);
     this.add(tree);
   }
-  console.log(this.length);
+
+  //console.log(this.length);
+
   for (var i = 0; i < this.length; i++) {
     this.getAt(i).update(this.velocity);
   }
+
   this.sort('y', Phaser.Group.SORT_ASCENDING);
 };
 
