@@ -4,7 +4,8 @@
 var Ground = require('../prefabs/ground');
 var Trees = require('../prefabs/trees');
 var Player = require('../prefabs/player');
-var Tree = require('../prefabs/tree');
+var Clouds = require('../prefabs/clouds');
+var Cloud = require('../prefabs/cloud');
 
 function Play() {}
 Play.prototype = {
@@ -19,7 +20,8 @@ Play.prototype = {
     this.cursors = this.game.input.keyboard.createCursorKeys()
     this.player = new Player(this.game, this.game.width/2, this.game.height/2, this.cursors, this.velocity);
 
-    //this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+    this.clouds = new Clouds(this.game, this.velocity);
+    //this.game.scale.scaleMode = Phaser.ScaleManaer.SHOW_ALL;
     //this.game.scale.fullscreenScaleMode = Phaser.ScaleManager.SHOW_ALL;
     //this.game.scale.refresh();
     //this.game.input.onDown.add(this.gofull, this);

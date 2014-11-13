@@ -19,7 +19,7 @@ window.onload = function () {
   game.state.start('boot');
 };
 
-},{"./states/boot":8,"./states/gameover":9,"./states/menu":10,"./states/play":11,"./states/preload":12,"./states/title":13}],2:[function(require,module,exports){
+},{"./states/boot":10,"./states/gameover":11,"./states/menu":12,"./states/play":13,"./states/preload":14,"./states/title":15}],2:[function(require,module,exports){
 'use strict';
 
 var AssetLoader = (function () {
@@ -62,6 +62,91 @@ module.exports = AssetLoader;
 },{}],3:[function(require,module,exports){
 'use strict';
 
+var Cloud = function(game, x, y) {
+  Phaser.Sprite.call(this, game, x, y, 'cloud');
+  game.physics.arcade.enableBody(this);
+  this.body.immovable = true;
+  this.checkWorldBounds = true;
+  this.outOfBoundsKill = false;
+};
+
+Cloud.prototype = Object.create(Phaser.Sprite.prototype);
+Cloud.prototype.constructor = Cloud;
+
+Cloud.prototype.update = function(velocity) {
+  this.body.velocity.x = velocity.x;
+  this.body.velocity.y = velocity.y;
+  if (!this.outOfBoundsKill &&
+      (this.x < this.game.world.width &&
+       this.x > 0 &&
+       this.y < this.game.world.height &&
+       this.y > 0)) {
+    this.outOfBoundsKill = true;
+  }
+  if (!this.alive) {
+    this.destroy();
+  };
+};
+
+module.exports = Cloud;
+
+},{}],4:[function(require,module,exports){
+'use strict';
+
+var Cloud = require('../prefabs/cloud');
+
+var Clouds = function(game, velocity) {
+  Phaser.Group.call(this, game);
+  this.maxClouds = (window.innerHeight > window.innerWidth)
+    && Math.ceil(window.innerHeight / 40)
+    || Math.ceil(window.innerWidth / 40);
+  this.resolution = 25;
+  this.velocity = velocity;
+  for (var i = 0; i < this.maxClouds; i++) {
+    var x = game.math.snapTo(game.world.randomX, this.resolution);
+    var y = game.math.snapTo(game.world.randomY, this.resolution);
+    var cloud = new Cloud(game, x, y, this.velocity);
+    this.add(cloud);
+  }
+  this.alpha = .5;
+};
+
+Clouds.prototype = Object.create(Phaser.Group.prototype);
+Clouds.prototype.constructor = Clouds;
+
+Clouds.prototype.update = function() {
+  if (this.length < this.maxClouds) {
+    var cloud, x, y;
+    if (this.velocity.y > 0) {
+      x = this.game.math.snapTo(this.game.world.randomX, this.resolution);
+      y = -100;
+    } else if (this.velocity.y < 0) {
+      x = this.game.math.snapTo(this.game.world.randomX, this.resolution);
+      y = this.game.world.height + 10;
+    } else if (this.velocity.x > 0) {
+      y = this.game.math.snapTo(this.game.world.randomY, this.resolution);
+      x = -300;
+    } else {
+      y = this.game.math.snapTo(this.game.world.randomY, this.resolution);
+      x = this.game.world.width;
+    }
+    cloud = new Cloud(this.game, x, y);
+    this.add(cloud);
+  }
+  for (var i = 0; i < this.length; i++) {
+    this.getAt(i).update(this.velocity);
+  }
+
+  this.sort('y', Phaser.Group.SORT_ASCENDING);
+};
+
+
+
+module.exports = Clouds;
+
+},{"../prefabs/cloud":3}],5:[function(require,module,exports){
+'use strict';
+
 var Ground = function(game, x, y, w, h) {
   Phaser.TileSprite.call(this, game, x, y, w, h, 'grass');
   game.add.existing(this);
@@ -78,7 +163,7 @@ Ground.prototype.update = function() {
 
 module.exports = Ground;
 
-},{}],4:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 'use strict';
 
 var Player = function(game, x, y, controls, velocity) {
@@ -153,7 +238,7 @@ Player.prototype.update = function() {
 
 module.exports = Player;
 
-},{}],5:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 'use strict';
 
 //var Treetop = require('../prefabs/treetop');
@@ -191,7 +276,7 @@ Tree.prototype.update = function(velocity) {
 
 module.exports = Tree;
 
-},{"../prefabs/treebottom":6}],6:[function(require,module,exports){
+},{"../prefabs/treebottom":8}],8:[function(require,module,exports){
 'use strict';
 
 var Treebottom = function(game, x, y, frame) {
@@ -212,7 +297,7 @@ Treebottom.prototype.update = function() {
 
 module.exports = Treebottom;
 
-},{}],7:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 'use strict';
 
 var Tree = require('../prefabs/tree');
@@ -226,7 +311,7 @@ var Trees = function(game, velocity) {
   for (var i = 0; i < this.maxTrees; i++) {
     var x = game.math.snapTo(game.world.randomX, this.resolution);
     var y = game.math.snapTo(game.world.randomY, this.resolution);
-    var tree = new Tree(game, this, x, y, this.collisionArray);
+    var tree = new Tree(game, this, x, y);
     this.add(tree);
   }
   this.velocity = velocity;
@@ -266,7 +351,7 @@ Trees.prototype.update = function() {
 
 module.exports = Trees;
 
-},{"../prefabs/tree":5}],8:[function(require,module,exports){
+},{"../prefabs/tree":7}],10:[function(require,module,exports){
 
 'use strict';
 
@@ -285,7 +370,7 @@ Boot.prototype = {
 
 module.exports = Boot;
 
-},{}],9:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 
 'use strict';
 function GameOver() {}
@@ -313,7 +398,7 @@ GameOver.prototype = {
 };
 module.exports = GameOver;
 
-},{}],10:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 
 'use strict';
 function Menu() {}
@@ -345,14 +430,15 @@ Menu.prototype = {
 
 module.exports = Menu;
 
-},{}],11:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 'use strict';
 
 // import player, slime, tree
 var Ground = require('../prefabs/ground');
 var Trees = require('../prefabs/trees');
 var Player = require('../prefabs/player');
-var Tree = require('../prefabs/tree');
+var Clouds = require('../prefabs/clouds');
+var Cloud = require('../prefabs/cloud');
 
 function Play() {}
 Play.prototype = {
@@ -367,7 +453,8 @@ Play.prototype = {
     this.cursors = this.game.input.keyboard.createCursorKeys()
     this.player = new Player(this.game, this.game.width/2, this.game.height/2, this.cursors, this.velocity);
 
-    //this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+    this.clouds = new Clouds(this.game, this.velocity);
+    //this.game.scale.scaleMode = Phaser.ScaleManaer.SHOW_ALL;
     //this.game.scale.fullscreenScaleMode = Phaser.ScaleManager.SHOW_ALL;
     //this.game.scale.refresh();
     //this.game.input.onDown.add(this.gofull, this);
@@ -386,7 +473,7 @@ Play.prototype = {
 
 module.exports = Play;
 
-},{"../prefabs/ground":3,"../prefabs/player":4,"../prefabs/tree":5,"../prefabs/trees":7}],12:[function(require,module,exports){
+},{"../prefabs/cloud":3,"../prefabs/clouds":4,"../prefabs/ground":5,"../prefabs/player":6,"../prefabs/trees":9}],14:[function(require,module,exports){
 'use strict';
 
 var AssetLoader = require('../prefabs/AssetLoader');
@@ -403,7 +490,7 @@ Preload.prototype = {
 
     this.load.onLoadComplete.addOnce(this.onLoadComplete, this);
     this.load.setPreloadSprite(this.asset);
-    var images = [ 'treebottom', 'treetop', 'grass' ];
+    var images = [ 'treebottom', 'treetop', 'grass', 'cloud'];
     var sprites = [ { name: 'player', w: 32, h: 40, frames: 12 } ];
     AssetLoader.loadImages.call(this, images);
     AssetLoader.loadSprites.call(this, sprites);
@@ -423,7 +510,7 @@ Preload.prototype = {
 
 module.exports = Preload;
 
-},{"../prefabs/AssetLoader":2}],13:[function(require,module,exports){
+},{"../prefabs/AssetLoader":2}],15:[function(require,module,exports){
 'use strict';
 function Title() {}
 

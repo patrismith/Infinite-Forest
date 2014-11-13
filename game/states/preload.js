@@ -14,7 +14,7 @@ Preload.prototype = {
 
     this.load.onLoadComplete.addOnce(this.onLoadComplete, this);
     this.load.setPreloadSprite(this.asset);
-    var images = [ 'treebottom', 'treetop', 'grass' ];
+    var images = [ 'treebottom', 'treetop', 'grass', 'cloud'];
     var sprites = [ { name: 'player', w: 32, h: 40, frames: 12 } ];
     AssetLoader.loadImages.call(this, images);
     AssetLoader.loadSprites.call(this, sprites);

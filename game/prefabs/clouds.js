@@ -1,47 +1,45 @@
 'use strict';
 
-var Tree = require('../prefabs/tree');
+var Cloud = require('../prefabs/cloud');
 
-var Trees = function(game, velocity) {
+var Clouds = function(game, velocity) {
   Phaser.Group.call(this, game);
-  this.maxTrees = (window.innerHeight > window.innerWidth)
+  this.maxClouds = (window.innerHeight > window.innerWidth)
     && Math.ceil(window.innerHeight / 40)
     || Math.ceil(window.innerWidth / 40);
-  this.resolution = 100;
-  for (var i = 0; i < this.maxTrees; i++) {
+  this.resolution = 25;
+  this.velocity = velocity;
+  for (var i = 0; i < this.maxClouds; i++) {
     var x = game.math.snapTo(game.world.randomX, this.resolution);
     var y = game.math.snapTo(game.world.randomY, this.resolution);
-    var tree = new Tree(game, this, x, y);
-    this.add(tree);
+    var cloud = new Cloud(game, x, y, this.velocity);
+    this.add(cloud);
   }
-  this.velocity = velocity;
+  this.alpha = .5;
 };
 
-Trees.prototype = Object.create(Phaser.Group.prototype);
-Trees.prototype.constructor = Trees;
+Clouds.prototype = Object.create(Phaser.Group.prototype);
+Clouds.prototype.constructor = Clouds;
 
-Trees.prototype.update = function() {
-  if (this.length < this.maxTrees) {
-    var tree, x, y;
+Clouds.prototype.update = function() {
+  if (this.length < this.maxClouds) {
+    var cloud, x, y;
     if (this.velocity.y > 0) {
       x = this.game.math.snapTo(this.game.world.randomX, this.resolution);
-      y = -128;
+      y = -100;
     } else if (this.velocity.y < 0) {
       x = this.game.math.snapTo(this.game.world.randomX, this.resolution);
       y = this.game.world.height + 10;
     } else if (this.velocity.x > 0) {
       y = this.game.math.snapTo(this.game.world.randomY, this.resolution);
-      x = -128;
+      x = -300;
     } else {
       y = this.game.math.snapTo(this.game.world.randomY, this.resolution);
       x = this.game.world.width;
     }
-    tree = new Tree(this.game, this, x, y);
-    this.add(tree);
+    cloud = new Cloud(this.game, x, y);
+    this.add(cloud);
   }
-
-  //console.log(this.length);
-
   for (var i = 0; i < this.length; i++) {
     this.getAt(i).update(this.velocity);
   }
@@ -49,4 +47,6 @@ Trees.prototype.update = function() {
   this.sort('y', Phaser.Group.SORT_ASCENDING);
 };
 
-module.exports = Trees;
+
+
+module.exports = Clouds;
