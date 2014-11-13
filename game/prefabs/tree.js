@@ -26,6 +26,9 @@ Tree.prototype.update = function(velocity) {
   this.treebottom.body.velocity.x = velocity.x;
   this.treetop.body.velocity.y = velocity.y;
   this.treebottom.body.velocity.y = velocity.y;
+  if (!this.treetop.alive) {
+    this.destroy();
+  };
 };
 
 module.exports = Tree;
