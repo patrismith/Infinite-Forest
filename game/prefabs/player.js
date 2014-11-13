@@ -63,7 +63,6 @@ Player.prototype.update = function() {
     this.velocity.x = 0;
   }
   if (this.velocity.x < 0 && this.body.touching.right) {
-    console.log('fuck this');
     this.velocity.x = 0;
   }
 };

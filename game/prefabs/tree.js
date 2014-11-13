@@ -14,8 +14,6 @@ var Tree = function(game, parent, x, y, collisionArray) {
   this.y = y;
   this.treetop.checkWorldBounds = true;
   this.treetop.outOfBoundsKill = true;
-  this.treebottom.checkWorldBounds = true;
-  this.treebottom.outOfBoundsKill = true;
 };
 
 Tree.prototype = Object.create(Phaser.Group.prototype);
@@ -26,6 +24,13 @@ Tree.prototype.update = function(velocity) {
   this.treebottom.body.velocity.x = velocity.x;
   this.treetop.body.velocity.y = velocity.y;
   this.treebottom.body.velocity.y = velocity.y;
+  if (!this.outOfBoundsKill &&
+      (this.treetop.x < this.game.world.width &&
+       this.treetop.x > 0 &&
+       this.treetop.y < this.game.world.height &&
+       this.treetop.y > 0)) {
+    this.treetop.outOfBoundsKill = true;
+  }
   if (!this.treetop.alive) {
     this.destroy();
   };
