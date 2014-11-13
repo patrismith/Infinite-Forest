@@ -5,15 +5,15 @@ var Treebottom = require('../prefabs/treebottom');
 
 var Tree = function(game, parent, x, y, collisionArray) {
   Phaser.Group.call(this, game, parent, undefined, false, true, Phaser.Physics.ARCADE);
-  this.treetop = this.create(x, y, 'treetop');
-  this.treetop.body.immovable = true;
-  collisionArray.push(this.treetop);
-  this.treebottom = this.create(x, y+112, 'treebottom');
-  this.treebottom.body.immovable.true;
   this.x = x;
   this.y = y;
+  this.treetop = this.create(0,0, 'treetop');
+  this.treetop.body.immovable = true;
+  collisionArray.push(this.treetop);
+  this.treebottom = this.create(0, 112, 'treebottom');
+  this.treebottom.body.immovable.true;
   this.treetop.checkWorldBounds = true;
-  this.treetop.outOfBoundsKill = true;
+  this.treetop.outOfBoundsKill = false;
 };
 
 Tree.prototype = Object.create(Phaser.Group.prototype);

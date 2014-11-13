@@ -26,7 +26,7 @@ Trees.prototype.update = function() {
     var x = this.game.math.snapTo(this.game.world.randomX, 50);
     var y = this.game.world.height + 50;
     //console.log(x,y);
-    var tree = new Tree(this.game, this, Math.floor(Math.random()*400), Math.floor(Math.random()*300), this.collisionArray);
+    var tree = new Tree(this.game, this, Math.floor(Math.random()*400), y, this.collisionArray);
     this.add(tree);
   }
   console.log(this.length);

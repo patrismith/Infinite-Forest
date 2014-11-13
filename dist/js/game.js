@@ -159,15 +159,15 @@ var Treebottom = require('../prefabs/treebottom');
 
 var Tree = function(game, parent, x, y, collisionArray) {
   Phaser.Group.call(this, game, parent, undefined, false, true, Phaser.Physics.ARCADE);
-  this.treetop = this.create(x, y, 'treetop');
-  this.treetop.body.immovable = true;
-  collisionArray.push(this.treetop);
-  this.treebottom = this.create(x, y+112, 'treebottom');
-  this.treebottom.body.immovable.true;
   this.x = x;
   this.y = y;
+  this.treetop = this.create(0,0, 'treetop');
+  this.treetop.body.immovable = true;
+  collisionArray.push(this.treetop);
+  this.treebottom = this.create(0, 112, 'treebottom');
+  this.treebottom.body.immovable.true;
   this.treetop.checkWorldBounds = true;
-  this.treetop.outOfBoundsKill = true;
+  this.treetop.outOfBoundsKill = false;
 };
 
 Tree.prototype = Object.create(Phaser.Group.prototype);
@@ -242,7 +242,7 @@ Trees.prototype.update = function() {
     var x = this.game.math.snapTo(this.game.world.randomX, 50);
     var y = this.game.world.height + 50;
     //console.log(x,y);
-    var tree = new Tree(this.game, this, Math.floor(Math.random()*400), Math.floor(Math.random()*300), this.collisionArray);
+    var tree = new Tree(this.game, this, Math.floor(Math.random()*400), y, this.collisionArray);
     this.add(tree);
   }
   console.log(this.length);
@@ -361,10 +361,12 @@ module.exports = Menu;
 var Ground = require('../prefabs/ground');
 var Trees = require('../prefabs/trees');
 var Player = require('../prefabs/player');
+var Tree = require('../prefabs/tree');
 
 function Play() {}
 Play.prototype = {
   create: function() {
+
     this.treetops = [];
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
     this.velocity = {x: 0, y: 0, canMove: true};
@@ -373,7 +375,20 @@ Play.prototype = {
     this.trees = new Trees(this.game, this.treetops, this.velocity);
 
     this.cursors = this.game.input.keyboard.createCursorKeys()
-    this.player = new Player(this.game, this.game.world.width/2, this.game.world.height/2, this.cursors, this.velocity);
+    this.player = new Player(this.game, this.game.width/2, this.game.height/2, this.cursors, this.velocity);
+
+    console.log(this.game.world.width, this.game.world.height);
+    //this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+    //this.game.scale.fullscreenScaleMode = Phaser.ScaleManager.SHOW_ALL;
+    //this.game.scale.refresh();
+    //this.game.input.onDown.add(this.gofull, this);
+  },
+  gofull: function() {
+    if (this.game.scale.isFullScreen) {
+      this.game.scale.stopFullScreen();
+    } else {
+      this.game.scale.startFullScreen(false);
+    }
   },
   update: function() {
     this.game.physics.arcade.collide(this.player, this.treetops);
@@ -382,7 +397,7 @@ Play.prototype = {
 
 module.exports = Play;
 
-},{"../prefabs/ground":3,"../prefabs/player":4,"../prefabs/trees":7}],13:[function(require,module,exports){
+},{"../prefabs/ground":3,"../prefabs/player":4,"../prefabs/tree":5,"../prefabs/trees":7}],13:[function(require,module,exports){
 'use strict';
 
 var AssetLoader = require('../prefabs/AssetLoader');
