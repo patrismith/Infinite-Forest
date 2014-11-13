@@ -20,7 +20,7 @@ window.onload = function () {
   game.state.start('boot');
 };
 
-},{"./states/boot":9,"./states/gameover":10,"./states/menu":11,"./states/play":12,"./states/preload":13,"./states/title":14}],2:[function(require,module,exports){
+},{"./states/boot":8,"./states/gameover":9,"./states/menu":10,"./states/play":11,"./states/preload":12,"./states/title":13}],2:[function(require,module,exports){
 'use strict';
 
 var AssetLoader = (function () {
@@ -92,6 +92,7 @@ var Player = function(game, x, y, controls, velocity) {
   this.game.add.existing(this);
   this.velocity = velocity;
   this.body.immovable.true;
+  console.log(this.addChild);
 };
 
 Player.prototype = Object.create(Phaser.Sprite.prototype);
@@ -154,49 +155,44 @@ module.exports = Player;
 },{}],5:[function(require,module,exports){
 'use strict';
 
-var Treetop = require('../prefabs/treetop');
+//var Treetop = require('../prefabs/treetop');
 var Treebottom = require('../prefabs/treebottom');
 
 var Tree = function(game, parent, x, y, collisionArray) {
-  Phaser.Group.call(this, game, parent, undefined, false, true, Phaser.Physics.ARCADE);
-  this.x = x;
-  this.y = y;
-  this.treetop = this.create(0,0, 'treetop');
-  this.treetop.body.immovable = true;
-  this.collisionArray = collisionArray;
-  this.collisionArray.push(this.treetop);
-  this.treebottom = this.create(0, 112, 'treebottom');
-  this.treebottom.body.immovable.true;
-  this.treetop.checkWorldBounds = true;
-  this.treetop.outOfBoundsKill = false;
+  Phaser.Sprite.call(this, game, x, y, 'treetop');
+  game.physics.arcade.enableBody(this);
+  this.body.immovable = true;
+  this.checkWorldBounds = true;
+  this.outOfBoundsKill = false;
+
+  this.treebottom = game.add.sprite(0, 112, 'treebottom');
+  this.addChild(this.treebottom);
 };
 
-Tree.prototype = Object.create(Phaser.Group.prototype);
+Tree.prototype = Object.create(Phaser.Sprite.prototype);
 Tree.prototype.constructor = Tree;
 
 Tree.prototype.update = function(velocity) {
-  this.treetop.body.velocity.x = velocity.x;
-  this.treebottom.body.velocity.x = velocity.x;
-  this.treetop.body.velocity.y = velocity.y;
-  this.treebottom.body.velocity.y = velocity.y;
-  if (!this.treetop.outOfBoundsKill &&
+  this.body.velocity.x = velocity.x;
+  this.body.velocity.y = velocity.y;
+  if (!this.outOfBoundsKill &&
       (this.x < this.game.world.width &&
        this.x > 0 &&
        this.y < this.game.world.height &&
        this.y > 0)) {
     console.log('kill me');
-    this.treetop.outOfBoundsKill = true;
+    this.outOfBoundsKill = true;
   }
-  if (!this.treetop.alive) {
+  if (!this.alive) {
+    this.treebottom.destroy();
     this.destroy();
     console.log('tree destroyed');
-    this.collisionArray.pop(this.treetop);
   };
 };
 
 module.exports = Tree;
 
-},{"../prefabs/treebottom":6,"../prefabs/treetop":8}],6:[function(require,module,exports){
+},{"../prefabs/treebottom":6}],6:[function(require,module,exports){
 'use strict';
 
 var Treebottom = function(game, x, y, frame) {
@@ -262,27 +258,6 @@ Trees.prototype.update = function() {
 module.exports = Trees;
 
 },{"../prefabs/tree":5}],8:[function(require,module,exports){
-'use strict';
-
-var Treetop = function(game, x, y, frame) {
-  Phaser.Sprite.call(this, game, x, y, 'treetop', frame);
-
-  // initialize your prefab here
-  
-};
-
-Treetop.prototype = Object.create(Phaser.Sprite.prototype);
-Treetop.prototype.constructor = Treetop;
-
-Treetop.prototype.update = function() {
-  
-  // write your prefab's specific update code here
-  
-};
-
-module.exports = Treetop;
-
-},{}],9:[function(require,module,exports){
 
 'use strict';
 
@@ -301,7 +276,7 @@ Boot.prototype = {
 
 module.exports = Boot;
 
-},{}],10:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 
 'use strict';
 function GameOver() {}
@@ -329,7 +304,7 @@ GameOver.prototype = {
 };
 module.exports = GameOver;
 
-},{}],11:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 
 'use strict';
 function Menu() {}
@@ -361,7 +336,7 @@ Menu.prototype = {
 
 module.exports = Menu;
 
-},{}],12:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 'use strict';
 
 // import player, slime, tree
@@ -384,7 +359,6 @@ Play.prototype = {
     this.cursors = this.game.input.keyboard.createCursorKeys()
     this.player = new Player(this.game, this.game.width/2, this.game.height/2, this.cursors, this.velocity);
 
-    console.log(this.game.world.width, this.game.world.height);
     //this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
     //this.game.scale.fullscreenScaleMode = Phaser.ScaleManager.SHOW_ALL;
     //this.game.scale.refresh();
@@ -398,13 +372,13 @@ Play.prototype = {
     }
   },
   update: function() {
-    this.game.physics.arcade.collide(this.player, this.treetops);
+    this.game.physics.arcade.collide(this.player, this.trees);
   }
 };
 
 module.exports = Play;
 
-},{"../prefabs/ground":3,"../prefabs/player":4,"../prefabs/tree":5,"../prefabs/trees":7}],13:[function(require,module,exports){
+},{"../prefabs/ground":3,"../prefabs/player":4,"../prefabs/tree":5,"../prefabs/trees":7}],12:[function(require,module,exports){
 'use strict';
 
 var AssetLoader = require('../prefabs/AssetLoader');
@@ -439,7 +413,7 @@ Preload.prototype = {
 
 module.exports = Preload;
 
-},{"../prefabs/AssetLoader":2}],14:[function(require,module,exports){
+},{"../prefabs/AssetLoader":2}],13:[function(require,module,exports){
 'use strict';
 function Title() {}
 

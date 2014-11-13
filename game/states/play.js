@@ -20,7 +20,6 @@ Play.prototype = {
     this.cursors = this.game.input.keyboard.createCursorKeys()
     this.player = new Player(this.game, this.game.width/2, this.game.height/2, this.cursors, this.velocity);
 
-    console.log(this.game.world.width, this.game.world.height);
     //this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
     //this.game.scale.fullscreenScaleMode = Phaser.ScaleManager.SHOW_ALL;
     //this.game.scale.refresh();
@@ -34,7 +33,7 @@ Play.prototype = {
     }
   },
   update: function() {
-    this.game.physics.arcade.collide(this.player, this.treetops);
+    this.game.physics.arcade.collide(this.player, this.trees);
   }
 };
 

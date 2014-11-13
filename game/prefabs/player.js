@@ -10,6 +10,7 @@ var Player = function(game, x, y, controls, velocity) {
   this.game.add.existing(this);
   this.velocity = velocity;
   this.body.immovable.true;
+  console.log(this.addChild);
 };
 
 Player.prototype = Object.create(Phaser.Sprite.prototype);
