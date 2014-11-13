@@ -12,6 +12,10 @@ var Tree = function(game, parent, x, y, collisionArray) {
   this.treebottom.body.immovable.true;
   this.x = x;
   this.y = y;
+  this.treetop.checkWorldBounds = true;
+  this.treetop.outOfBoundsKill = true;
+  this.treebottom.checkWorldBounds = true;
+  this.treebottom.outOfBoundsKill = true;
 };
 
 Tree.prototype = Object.create(Phaser.Group.prototype);

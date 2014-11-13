@@ -20,11 +20,6 @@ Play.prototype = {
   },
   update: function() {
     this.game.physics.arcade.collide(this.player, this.treetops);
-
-    for (var i = 0; i < this.trees.length; i++) {
-      this.trees.getAt(i).update(this.velocity);
-    }
-
   }
 };
 
