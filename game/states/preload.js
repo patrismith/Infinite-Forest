@@ -14,8 +14,10 @@ Preload.prototype = {
 
     this.load.onLoadComplete.addOnce(this.onLoadComplete, this);
     this.load.setPreloadSprite(this.asset);
-    var images = [ 'treebottom', 'treetop', 'grass', 'player' ];
+    var images = [ 'treebottom', 'treetop', 'grass' ];
+    var sprites = [ { name: 'player', w: 32, h: 40, frames: 12 } ];
     AssetLoader.loadImages.call(this, images);
+    AssetLoader.loadSprites.call(this, sprites);
   },
   create: function() {
     this.asset.cropEnabled = false;

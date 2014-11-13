@@ -3,10 +3,9 @@
 
 //global variables
 window.onload = function () {
-  //var game = new Phaser.Game(800, 600, Phaser.AUTO, 'procjam');
   var game = new Phaser.Game(window.innerWidth * window.devicePixelRatio,
                              window.innerHeight * window.devicePixelRatio,
-                             Phaser.AUTO, 'procjam');
+                             Phaser.AUTO, 'procjam', null, false, false);
 
   // Game States
   game.state.add('boot', require('./states/boot'));
@@ -83,16 +82,25 @@ module.exports = Ground;
 'use strict';
 
 var Player = function(game, x, y, controls, velocity) {
-  Phaser.Sprite.call(this, game, x, y, 'player');
+  Phaser.Sprite.call(this, game, x, y, 'player', 0);
   game.physics.arcade.enableBody(this);
-  // start walking
   this.anchor.setTo(0.5,0.5);
   this.speed = 50;
   this.controls = controls;
   this.game.add.existing(this);
   this.velocity = velocity;
   this.body.immovable.true;
-  console.log(this.addChild);
+
+
+  this.animSpeed = 6;
+  this.animations.add('walkRight', [0,1,2,1]);
+  this.animations.add('walkLeft', [3,4,5,4]);
+  this.animations.add('walkDown', [6,7,8,7]);
+  this.animations.add('walkUp', [9,10,11,10]);
+  this.animations.play('walkRight', this.animSpeed, true);
+
+  // start walking
+  this.velocity.x = -this.speed;
 };
 
 Player.prototype = Object.create(Phaser.Sprite.prototype);
@@ -100,24 +108,10 @@ Player.prototype.constructor = Player;
 
 Player.prototype.update = function() {
 
-  // make walking decisions:
-  // 1. find out if moving forward (function)
-  //    this function will see if the player is colliding w/ a tree
-  //    on the side that's facing the player's walking direction
-  // 2. if not moving forward, turn randomly clockwise or counter-clockwise
-  //    there will be a list of directions, n e s w , use mod + additions/subtractions to figure
-
   // make attack decisions:
   // 1. find out if touching slime (function)
   // 1a. if slime touching non-forward-facing direction, set direction to that
   // 2. if slime touching forward-facing direction, set animation to attacking slime
-
-  // player has a variable that says which direction they need to move in
-  // player also has a variable that says whether to be walking or not
-  // 1. if walking, set animation to walking and that direction
-  //    also set velocity to walking velocity
-  // 2. if not walking, set animation to standing and that direction
-  //    also set velocity to 0
 
   this.body.velocity.x = 0;
   this.body.velocity.y = 0;
@@ -125,28 +119,35 @@ Player.prototype.update = function() {
   if (this.controls.right.isDown && !this.body.touching.right) {
     this.velocity.y = 0;
     this.velocity.x = -this.speed;
+    this.animations.play('walkRight', this.animSpeed, true);
   } else if (this.controls.left.isDown && !this.body.touching.left) {
     this.velocity.y = 0;
     this.velocity.x = this.speed;
+    this.animations.play('walkLeft', this.animSpeed, true);
   } else if (this.controls.up.isDown && !this.body.touching.up) {
     this.velocity.y = this.speed;
     this.velocity.x = 0;
+    this.animations.play('walkUp', this.animSpeed, true);
   } else if (this.controls.down.isDown && !this.body.touching.down) {
     this.velocity.y = -this.speed;
     this.velocity.x = 0;
+    this.animations.play('walkDown', this.animSpeed, true);
   };
 
-  if (this.velocity.y > 0 && this.body.touching.up) {
+  if ((this.velocity.y > 0 && this.body.touching.up) ||
+      (this.velocity.y < 0 && this.body.touching.down)) {
     this.velocity.y = 0;
-  }
-  if (this.velocity.y < 0 && this.body.touching.down) {
-    this.velocity.y = 0;
-  }
-  if (this.velocity.x > 0 && this.body.touching.left) {
+    var speed = Math.floor(Math.random()*2) > 0 && this.speed || -this.speed;
+    this.velocity.x = speed;
+    if (speed < 0) this.animations.play('walkRight', this.animSpeed, true);
+    else this.animations.play('walkLeft', this.animSpeed, true);
+  } else if ((this.velocity.x > 0 && this.body.touching.left) ||
+             (this.velocity.x < 0 && this.body.touching.right)) {
     this.velocity.x = 0;
-  }
-  if (this.velocity.x < 0 && this.body.touching.right) {
-    this.velocity.x = 0;
+    var speed = Math.floor(Math.random()*2) > 0 && this.speed || -this.speed;
+    this.velocity.y = speed;
+    if (speed < 0) this.animations.play('walkDown', this.animSpeed, true);
+    else this.animations.play('walkUp', this.animSpeed, true);
   }
 };
 
@@ -218,10 +219,13 @@ var Tree = require('../prefabs/tree');
 
 var Trees = function(game, velocity) {
   Phaser.Group.call(this, game);
-  this.maxTrees = 20;
-  for (var i = 0; i < 20; i++) {
-    var x = game.math.snapTo(game.world.randomX, 75);
-    var y = game.math.snapTo(game.world.randomY, 75);
+  this.maxTrees = (window.innerHeight > window.innerWidth)
+    && Math.ceil(window.innerHeight / 40)
+    || Math.ceil(window.innerWidth / 40);
+  this.resolution = 100;
+  for (var i = 0; i < this.maxTrees; i++) {
+    var x = game.math.snapTo(game.world.randomX, this.resolution);
+    var y = game.math.snapTo(game.world.randomY, this.resolution);
     var tree = new Tree(game, this, x, y, this.collisionArray);
     this.add(tree);
   }
@@ -235,16 +239,16 @@ Trees.prototype.update = function() {
   if (this.length < this.maxTrees) {
     var tree, x, y;
     if (this.velocity.y > 0) {
-      x = this.game.math.snapTo(this.game.world.randomX, 75);
+      x = this.game.math.snapTo(this.game.world.randomX, this.resolution);
       y = -128;
     } else if (this.velocity.y < 0) {
-      x = this.game.math.snapTo(this.game.world.randomX, 75);
+      x = this.game.math.snapTo(this.game.world.randomX, this.resolution);
       y = this.game.world.height + 10;
     } else if (this.velocity.x > 0) {
-      y = this.game.math.snapTo(this.game.world.randomY, 75);
+      y = this.game.math.snapTo(this.game.world.randomY, this.resolution);
       x = -128;
     } else {
-      y = this.game.math.snapTo(this.game.world.randomY, 75);
+      y = this.game.math.snapTo(this.game.world.randomY, this.resolution);
       x = this.game.world.width;
     }
     tree = new Tree(this.game, this, x, y);
@@ -399,8 +403,10 @@ Preload.prototype = {
 
     this.load.onLoadComplete.addOnce(this.onLoadComplete, this);
     this.load.setPreloadSprite(this.asset);
-    var images = [ 'treebottom', 'treetop', 'grass', 'player' ];
+    var images = [ 'treebottom', 'treetop', 'grass' ];
+    var sprites = [ { name: 'player', w: 32, h: 40, frames: 12 } ];
     AssetLoader.loadImages.call(this, images);
+    AssetLoader.loadSprites.call(this, sprites);
   },
   create: function() {
     this.asset.cropEnabled = false;

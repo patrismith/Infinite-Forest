@@ -2,10 +2,9 @@
 
 //global variables
 window.onload = function () {
-  //var game = new Phaser.Game(800, 600, Phaser.AUTO, 'procjam');
   var game = new Phaser.Game(window.innerWidth * window.devicePixelRatio,
                              window.innerHeight * window.devicePixelRatio,
-                             Phaser.AUTO, 'procjam');
+                             Phaser.AUTO, 'procjam', null, false, false);
 
   // Game States
   game.state.add('boot', require('./states/boot'));
