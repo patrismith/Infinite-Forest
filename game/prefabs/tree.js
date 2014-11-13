@@ -3,7 +3,7 @@
 //var Treetop = require('../prefabs/treetop');
 var Treebottom = require('../prefabs/treebottom');
 
-var Tree = function(game, parent, x, y, collisionArray) {
+var Tree = function(game, parent, x, y) {
   Phaser.Sprite.call(this, game, x, y, 'treetop');
   game.physics.arcade.enableBody(this);
   this.body.immovable = true;
@@ -25,13 +25,11 @@ Tree.prototype.update = function(velocity) {
        this.x > 0 &&
        this.y < this.game.world.height &&
        this.y > 0)) {
-    console.log('kill me');
     this.outOfBoundsKill = true;
   }
   if (!this.alive) {
     this.treebottom.destroy();
     this.destroy();
-    console.log('tree destroyed');
   };
 };
 

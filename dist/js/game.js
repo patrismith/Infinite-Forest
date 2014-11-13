@@ -158,7 +158,7 @@ module.exports = Player;
 //var Treetop = require('../prefabs/treetop');
 var Treebottom = require('../prefabs/treebottom');
 
-var Tree = function(game, parent, x, y, collisionArray) {
+var Tree = function(game, parent, x, y) {
   Phaser.Sprite.call(this, game, x, y, 'treetop');
   game.physics.arcade.enableBody(this);
   this.body.immovable = true;
@@ -180,13 +180,11 @@ Tree.prototype.update = function(velocity) {
        this.x > 0 &&
        this.y < this.game.world.height &&
        this.y > 0)) {
-    console.log('kill me');
     this.outOfBoundsKill = true;
   }
   if (!this.alive) {
     this.treebottom.destroy();
     this.destroy();
-    console.log('tree destroyed');
   };
 };
 
@@ -218,14 +216,12 @@ module.exports = Treebottom;
 
 var Tree = require('../prefabs/tree');
 
-var Trees = function(game, collisionArray, velocity) {
+var Trees = function(game, velocity) {
   Phaser.Group.call(this, game);
   this.maxTrees = 20;
-  this.collisionArray = collisionArray;
   for (var i = 0; i < 20; i++) {
     var x = game.math.snapTo(game.world.randomX, 75);
     var y = game.math.snapTo(game.world.randomY, 75);
-    //console.log(x,y);
     var tree = new Tree(game, this, x, y, this.collisionArray);
     this.add(tree);
   }
@@ -236,13 +232,22 @@ Trees.prototype = Object.create(Phaser.Group.prototype);
 Trees.prototype.constructor = Trees;
 
 Trees.prototype.update = function() {
-  // if there's trees offscreen (give a margin of 800/600 pixels either side), delete
-  // recycle them to trees that are about to be onscreen (within that margin)
   if (this.length < this.maxTrees) {
-    var x = this.game.math.snapTo(this.game.world.randomX, 75);
-    var y = this.game.world.height + 10;
-    //console.log(x,y);
-    var tree = new Tree(this.game, this, x, y, this.collisionArray);
+    var tree, x, y;
+    if (this.velocity.y > 0) {
+      x = this.game.math.snapTo(this.game.world.randomX, 75);
+      y = -128;
+    } else if (this.velocity.y < 0) {
+      x = this.game.math.snapTo(this.game.world.randomX, 75);
+      y = this.game.world.height + 10;
+    } else if (this.velocity.x > 0) {
+      y = this.game.math.snapTo(this.game.world.randomY, 75);
+      x = -128;
+    } else {
+      y = this.game.math.snapTo(this.game.world.randomY, 75);
+      x = this.game.world.width;
+    }
+    tree = new Tree(this.game, this, x, y);
     this.add(tree);
   }
 
@@ -349,12 +354,11 @@ function Play() {}
 Play.prototype = {
   create: function() {
 
-    this.treetops = [];
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
     this.velocity = {x: 0, y: 0, canMove: true};
 
     this.ground = new Ground(this.game, 0, 0, this.game.world.width, this.game.world.height);
-    this.trees = new Trees(this.game, this.treetops, this.velocity);
+    this.trees = new Trees(this.game, this.velocity);
 
     this.cursors = this.game.input.keyboard.createCursorKeys()
     this.player = new Player(this.game, this.game.width/2, this.game.height/2, this.cursors, this.velocity);
