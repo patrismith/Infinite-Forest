@@ -26,6 +26,12 @@ Tree.prototype.update = function(velocity) {
        this.y < this.game.world.height &&
        this.y > 0)) {
     this.outOfBoundsKill = true;
+    }
+  if (this.x > this.game.world.width + 400 ||
+      this.x < -400 ||
+      this.y > this.game.world.height + 400 ||
+      this.y < -400) {
+    this.kill();
   }
   if (!this.alive) {
     this.treebottom.destroy();

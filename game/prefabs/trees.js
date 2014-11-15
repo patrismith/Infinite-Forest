@@ -25,13 +25,13 @@ Trees.prototype.update = function() {
     var tree, x, y;
     if (this.velocity.y > 0) {
       x = this.game.math.snapTo(this.game.world.randomX, this.resolution);
-      y = -128;
+      y = -160;
     } else if (this.velocity.y < 0) {
       x = this.game.math.snapTo(this.game.world.randomX, this.resolution);
       y = this.game.world.height + 10;
     } else if (this.velocity.x > 0) {
       y = this.game.math.snapTo(this.game.world.randomY, this.resolution);
-      x = -128;
+      x = -160;
     } else {
       y = this.game.math.snapTo(this.game.world.randomY, this.resolution);
       x = this.game.world.width;

@@ -26,13 +26,13 @@ Clouds.prototype.update = function() {
     var cloud, x, y;
     if (this.velocity.y > 0) {
       x = this.game.math.snapTo(this.game.world.randomX, this.resolution);
-      y = -100;
+      y = -200;
     } else if (this.velocity.y < 0) {
       x = this.game.math.snapTo(this.game.world.randomX, this.resolution);
       y = this.game.world.height + 10;
     } else if (this.velocity.x > 0) {
       y = this.game.math.snapTo(this.game.world.randomY, this.resolution);
-      x = -300;
+      x = -400;
     } else {
       y = this.game.math.snapTo(this.game.world.randomY, this.resolution);
       x = this.game.world.width;
