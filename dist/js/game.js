@@ -30,9 +30,9 @@ var AssetLoader = (function () {
         }
     };
 
-    function loadAudio (list, context) {
+    function loadAudio (list) {
         for (var i = 0; i < list.length; i++) {
-            context.load.audio(list[i], ['assets/audio/' + list[i] + '.ogg']);
+            this.load.audio(list[i], ['assets/audio/' + list[i] + '.ogg']);
         }
     };
 
@@ -454,8 +454,11 @@ var Cloud = require('../prefabs/cloud');
 
 function Play() {}
 Play.prototype = {
+  preload: function() {
+    this.music = this.game.add.audio('Infinite_Forest',1,true);
+    this.music.play('',0,.5,true);
+  },
   create: function() {
-
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
     this.velocity = {x: 0, y: 0, canMove: true};
 
@@ -466,16 +469,14 @@ Play.prototype = {
     this.player = new Player(this.game, this.game.width/2, this.game.height/2, this.cursors, this.velocity);
 
     this.clouds = new Clouds(this.game, this.velocity);
-    //this.game.scale.scaleMode = Phaser.ScaleManaer.SHOW_ALL;
-    //this.game.scale.fullscreenScaleMode = Phaser.ScaleManager.SHOW_ALL;
-    //this.game.scale.refresh();
-    //this.game.input.onDown.add(this.gofull, this);
+
+    this.game.input.onDown.add(this.mute, this);
   },
-  gofull: function() {
-    if (this.game.scale.isFullScreen) {
-      this.game.scale.stopFullScreen();
+  mute: function() {
+    if (this.music.isPlaying) {
+      this.music.pause();
     } else {
-      this.game.scale.startFullScreen(false);
+      this.music.resume();
     }
   },
   update: function() {
@@ -499,13 +500,14 @@ Preload.prototype = {
   preload: function() {
     this.asset = this.add.sprite(this.game.width/2,this.game.height/2, 'preloader');
     this.asset.anchor.setTo(0.5, 0.5);
-
     this.load.onLoadComplete.addOnce(this.onLoadComplete, this);
     this.load.setPreloadSprite(this.asset);
     var images = [ 'treebottom', 'treetop', 'grass', 'cloud'];
     var sprites = [ { name: 'player', w: 32, h: 42, frames: 12 } ];
+    var audio = [ 'Infinite_Forest' ];
     AssetLoader.loadImages.call(this, images);
     AssetLoader.loadSprites.call(this, sprites);
+    AssetLoader.loadAudio.call(this, audio);
   },
   create: function() {
     this.asset.cropEnabled = false;

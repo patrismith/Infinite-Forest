@@ -9,8 +9,11 @@ var Cloud = require('../prefabs/cloud');
 
 function Play() {}
 Play.prototype = {
+  preload: function() {
+    this.music = this.game.add.audio('Infinite_Forest',1,true);
+    this.music.play('',0,.5,true);
+  },
   create: function() {
-
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
     this.velocity = {x: 0, y: 0, canMove: true};
 
@@ -21,16 +24,14 @@ Play.prototype = {
     this.player = new Player(this.game, this.game.width/2, this.game.height/2, this.cursors, this.velocity);
 
     this.clouds = new Clouds(this.game, this.velocity);
-    //this.game.scale.scaleMode = Phaser.ScaleManaer.SHOW_ALL;
-    //this.game.scale.fullscreenScaleMode = Phaser.ScaleManager.SHOW_ALL;
-    //this.game.scale.refresh();
-    //this.game.input.onDown.add(this.gofull, this);
+
+    this.game.input.onDown.add(this.mute, this);
   },
-  gofull: function() {
-    if (this.game.scale.isFullScreen) {
-      this.game.scale.stopFullScreen();
+  mute: function() {
+    if (this.music.isPlaying) {
+      this.music.pause();
     } else {
-      this.game.scale.startFullScreen(false);
+      this.music.resume();
     }
   },
   update: function() {

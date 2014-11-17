@@ -8,9 +8,9 @@ var AssetLoader = (function () {
         }
     };
 
-    function loadAudio (list, context) {
+    function loadAudio (list) {
         for (var i = 0; i < list.length; i++) {
-            context.load.audio(list[i], ['assets/audio/' + list[i] + '.ogg']);
+            this.load.audio(list[i], ['assets/audio/' + list[i] + '.ogg']);
         }
     };
 

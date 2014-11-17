@@ -11,13 +11,14 @@ Preload.prototype = {
   preload: function() {
     this.asset = this.add.sprite(this.game.width/2,this.game.height/2, 'preloader');
     this.asset.anchor.setTo(0.5, 0.5);
-
     this.load.onLoadComplete.addOnce(this.onLoadComplete, this);
     this.load.setPreloadSprite(this.asset);
     var images = [ 'treebottom', 'treetop', 'grass', 'cloud'];
     var sprites = [ { name: 'player', w: 32, h: 42, frames: 12 } ];
+    var audio = [ 'Infinite_Forest' ];
     AssetLoader.loadImages.call(this, images);
     AssetLoader.loadSprites.call(this, sprites);
+    AssetLoader.loadAudio.call(this, audio);
   },
   create: function() {
     this.asset.cropEnabled = false;
